@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bug Fix Decision Tool</title>
+<style>
+:root{
+  --ink:#111827;--muted:#667085;--subtle:#98a2b3;--bg:#f3f4f8;--card:#fff;--line:#e4e7ec;
+  --purple:#5b2ca0;--purple2:#7b4bc0;--purpleSoft:#f4effa;--navy:#111827;
+  --green:#17745a;--greenSoft:#e8f5f0;--amber:#a15c00;--amberSoft:#fff3df;--red:#a92d31;--redSoft:#fdecec;
+  --shadow:0 12px 32px rgba(17,24,39,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select{font:inherit}
+.appbar{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--line)}
+.appbar-inner{max-width:1040px;margin:auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.brand{display:flex;align-items:center;gap:12px}.mark{width:36px;height:36px;border-radius:11px;background:linear-gradient(145deg,var(--purple),var(--purple2));box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+.brand strong{display:block;font-size:15px;letter-spacing:-.1px}.brand span{display:block;margin-top:1px;font-size:11px;color:var(--muted)}
+.top-actions{display:flex;gap:8px}.iconbtn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;height:38px;padding:0 13px;font-weight:750;font-size:12px;cursor:pointer}.iconbtn:hover{background:#f8f7fb}.helpicon{width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;background:var(--purpleSoft);color:var(--purple);font-size:12px;font-weight:900;margin-right:6px}
+.wrap{max-width:1040px;margin:auto;padding:28px 20px 60px}
+.intro{margin-bottom:20px}.intro h1{font-size:30px;line-height:1.1;letter-spacing:-.8px;margin:0}.intro p{margin:8px 0 0;color:var(--muted);font-size:14px;line-height:1.5;max-width:720px}
+.form-shell{display:grid;gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 4px 18px rgba(17,24,39,.035)}
+.bugid-card{padding:20px}.section-card{padding:22px}.section-title{display:flex;align-items:center;gap:12px;margin-bottom:18px}.section-icon{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--purpleSoft);color:var(--purple);font-weight:900}.section-title h2{margin:0;font-size:18px;letter-spacing:-.3px}.section-title p{margin:3px 0 0;font-size:12px;color:var(--muted)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{min-width:0}.field.full{grid-column:1/-1}.labelrow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}.labelrow label{font-size:12px;font-weight:800;color:#344054}.req{color:#d92d20}.points-mini{font-size:10px;font-weight:800;color:var(--purple);background:var(--purpleSoft);padding:3px 7px;border-radius:999px;white-space:nowrap}
+input,select{width:100%;height:48px;border:1px solid #d0d5dd;border-radius:13px;background:#fff;color:var(--ink);padding:0 13px;outline:none;transition:.16s}input:focus,select:focus{border-color:#8f6bc1;box-shadow:0 0 0 4px rgba(91,44,160,.09)}select:invalid{color:var(--subtle)}
+.scorehint{margin-top:6px;font-size:10px;color:#7b8190;line-height:1.35}.scorehint b{color:#525866}
+.form-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-top:4px}.microcopy{font-size:11px;color:var(--muted);max-width:600px}.actions{display:flex;gap:9px}.btn{border:0;border-radius:999px;height:44px;padding:0 18px;font-size:12px;font-weight:850;cursor:pointer}.primary{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;box-shadow:0 8px 18px rgba(91,44,160,.2)}.secondary{background:#fff;border:1px solid var(--line);color:#344054}.danger{background:#fff;color:#a92d31;border:1px solid #f0cccc}.hidden{display:none!important}
+.result-card{padding:0;overflow:hidden;scroll-margin-top:76px}.result-head{padding:24px 24px 20px;background:linear-gradient(180deg,#fff,#fbf9fe);border-bottom:1px solid var(--line)}.eyebrow{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:900}.decision-title{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:7px}.decision-title h2{margin:0;font-size:34px;letter-spacing:-.9px}.bugref{font-size:12px;font-weight:850;color:#475467}.recommend{margin-top:7px;color:#475467;font-size:13px;line-height:1.5}.summary-strip{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)}.metric{padding:18px 22px}.metric+ .metric{border-left:1px solid var(--line)}.metric .meta{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:850}.metric strong{font-size:26px}.band{display:inline-block;margin-left:7px;padding:4px 7px;border-radius:999px;background:var(--purpleSoft);color:var(--purple);font-size:10px;font-weight:900;vertical-align:4px}
+.breakdown{padding:22px 24px}.breakdown h3{margin:0 0 12px;font-size:15px}.breakgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.breakgroup{border:1px solid var(--line);border-radius:14px;overflow:hidden}.breakgroup-title{padding:10px 12px;background:#f8f7fb;font-size:11px;font-weight:850;color:#475467}.breakrow{display:grid;grid-template-columns:1.2fr 1fr auto;gap:8px;padding:10px 12px;border-top:1px solid var(--line);font-size:11px;align-items:center}.breakrow .crit{font-weight:750;color:#344054}.breakrow .ans{color:#667085}.pt{min-width:46px;text-align:center;border-radius:999px;background:#f2f4f7;padding:4px 6px;font-weight:850;color:#475467}.pt.override{background:var(--redSoft);color:var(--red)}
+.rationale{padding:0 24px 22px}.rationale-box{background:#f8f7fb;border-radius:14px;padding:14px}.rationale-box b{font-size:12px}.rationale ul{margin:8px 0 0;padding-left:18px;color:#525866;font-size:11px;line-height:1.5}.result-actions{display:flex;gap:9px;padding:0 24px 24px}
+.history{margin-top:16px;padding:20px}.history-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:13px}.history-head h2{margin:0;font-size:17px}.history-head p{margin:3px 0 0;font-size:11px;color:var(--muted)}.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px}.history table{width:100%;border-collapse:collapse;min-width:830px;font-size:11px}.history th,.history td{padding:11px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}.history th{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#667085;background:#f8f7fb}.history tr:last-child td{border-bottom:0}.chip{display:inline-block;border-radius:999px;padding:5px 8px;font-weight:900;font-size:9px}.now{background:var(--redSoft);color:var(--red)}.soon{background:var(--amberSoft);color:var(--amber)}.later{background:var(--greenSoft);color:var(--green)}.esc{background:#f5eafe;color:#6b2d8f}.mini{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:800;cursor:pointer}.details-row{background:#fcfcfe}.detail-breakdown{padding:4px 0}.history .breakgrid{grid-template-columns:1fr 1fr}.empty{text-align:center;padding:26px;color:var(--muted)}
+.footer{text-align:center;color:#8a90a0;font-size:10px;margin-top:18px;line-height:1.45}
+.modal-backdrop{position:fixed;inset:0;background:rgba(17,24,39,.44);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:18px;z-index:100}.modal-backdrop.show{display:flex}.modal{width:min(720px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.22)}.modal-head{position:sticky;top:0;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line);z-index:2}.modal-head h2{font-size:17px;margin:0}.close{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:18px}.modal-body{padding:20px}.modal p{font-size:12px;color:var(--muted);line-height:1.5}.matrix{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:11px;margin:12px 0 18px}.matrix th,.matrix td{padding:10px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center}.matrix th{background:#f8f7fb}.matrix tr:last-child>*{border-bottom:0}.matrix tr>*:last-child{border-right:0}.legend-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.legend{border:1px solid var(--line);border-radius:14px;padding:12px}.legend h3{font-size:12px;margin:0 0 8px}.legend div{font-size:10px;color:#525866;line-height:1.55}.toast{position:fixed;right:18px;bottom:18px;background:#111827;color:#fff;padding:10px 13px;border-radius:999px;font-size:11px;font-weight:800;opacity:0;transform:translateY(10px);transition:.18s;pointer-events:none;z-index:120}.toast.show{opacity:1;transform:none}
+@media(max-width:760px){.wrap{padding:22px 14px 48px}.appbar-inner{padding:12px 14px}.brand span{display:none}.intro h1{font-size:25px}.form-grid,.breakgrid,.history .breakgrid,.legend-grid,.summary-strip{grid-template-columns:1fr}.metric+.metric{border-left:0;border-top:1px solid var(--line)}.form-footer{align-items:stretch;flex-direction:column}.actions{width:100%}.actions .btn{flex:1}.section-card,.bugid-card{padding:18px}.result-head,.breakdown,.rationale,.result-actions{padding-left:18px;padding-right:18px}.decision-title{align-items:flex-start;flex-direction:column}.decision-title h2{font-size:29px}.top-actions .label-hide{display:none}}
+</style>
+</head>
+<body>
+<header class="appbar"><div class="appbar-inner"><div class="brand"><div class="mark"></div><div><strong>Bug Fix Decision Tool</strong><span>Release decision support</span></div></div><div class="top-actions"><button class="iconbtn" onclick="openHelp()"><span class="helpicon">?</span><span class="label-hide">Decision matrix</span></button></div></div></header>
+<main class="wrap">
+<section class="intro"><h1>Assess the bug. Get a disposition.</h1><p>Assess the issue and the impact of introducing a fix, then get a consistent recommendation: Fix Now, Fix Soon, Fix Later, or Escalate.</p></section>
+
+<div id="assessmentForm" class="form-shell">
+<section class="card bugid-card">
+  <div class="field full"><div class="labelrow"><label for="bugId">Bug ID <span class="req">*</span></label></div><input id="bugId" type="text" autocomplete="off" placeholder="e.g., DHPS-46762" /></div>
+</section>
+
+<section class="card section-card">
+  <div class="section-title"><div><h2>Issue Impact</h2><p>How significantly does this defect affect customers, safety, compliance, or expected use?</p></div></div>
+  <div class="form-grid">
+    <div class="field"><div class="labelrow"><label>Severity <span class="req">*</span></label></div><select id="severity" required><option value="" selected disabled>Select</option><option value="10">Critical</option><option value="7">High</option><option value="3">Medium</option><option value="1">Low</option></select></div>
+    <div class="field"><div class="labelrow"><label>Customer Impact <span class="req">*</span></label></div><select id="customer" required><option value="" selected disabled>Select</option><option value="8">Blocking</option><option value="5">Significant</option><option value="2">Minor</option><option value="0">None</option></select></div>
+    <div class="field"><div class="labelrow"><label>Safety Impact <span class="req">*</span></label></div><select id="safety" required><option value="" selected disabled>Select</option><option value="override">Yes — confirmed</option><option value="6">Potential / under assessment</option><option value="0">No</option></select></div>
+    <div class="field"><div class="labelrow"><label>Regulatory / Compliance Impact <span class="req">*</span></label></div><select id="regulatory" required><option value="" selected disabled>Select</option><option value="override">Yes — confirmed</option><option value="5">Potential / under assessment</option><option value="0">No</option></select></div>
+    <div class="field"><div class="labelrow"><label>Workaround <span class="req">*</span></label></div><select id="workaround" required><option value="" selected disabled>Select</option><option value="6">None</option><option value="3">Partial / difficult</option><option value="0">Available</option></select></div>
+    <div class="field"><div class="labelrow"><label>Occurrence / Exposure <span class="req">*</span></label></div><select id="occurrence" required><option value="" selected disabled>Select</option><option value="5">Common</option><option value="3">Occasional</option><option value="1">Rare</option></select></div>
+  </div>
+</section>
+
+<section class="card section-card">
+  <div class="section-title"><div><h2>Change Risk</h2><p>How much risk or disruption would introducing the fix create for the release?</p></div></div>
+  <div class="form-grid">
+    <div class="field"><div class="labelrow"><label>Level of Effort <span class="req">*</span></label></div><select id="effort" required><option value="" selected disabled>Select</option><option value="1">Small</option><option value="2">Medium</option><option value="3">Large</option></select></div>
+    <div class="field"><div class="labelrow"><label>Regression Risk <span class="req">*</span></label></div><select id="regression" required><option value="" selected disabled>Select</option><option value="1">Low</option><option value="2">Medium</option><option value="3">High</option></select></div>
+    <div class="field"><div class="labelrow"><label>Impact to Release Timeline <span class="req">*</span></label></div><select id="timeline" required><option value="" selected disabled>Select</option><option value="1">Low</option><option value="2">Medium</option><option value="3">High</option></select></div>
+    <div class="field"><div class="labelrow"><label>Release Phase <span class="req">*</span></label></div><select id="phase" required><option value="" selected disabled>Select</option><option value="0">Dev Ready (Documentation)</option><option value="1">Development</option><option value="2">Dry Run</option><option value="3">Design Validation (Release Candidate Validation)</option></select></div>
+  </div>
+</section>
+
+<div class="form-footer"><div class="microcopy">Confirmed Safety or Regulatory/Compliance impact triggers mandatory escalation. All selections are required.</div><div class="actions"><button class="btn secondary" onclick="resetForm()">Clear</button><button class="btn primary" onclick="evaluateBug()">Evaluate</button></div></div>
+</div>
+
+<section id="result" class="card result-card hidden"><div id="decision"></div></section>
+
+<section class="card history">
+  <div class="history-head"><div><h2>Assessment History</h2><p>Stored locally in this browser. Open Details to review the completed assessment and scoring.</p></div><button class="btn danger" onclick="clearHistory()">Clear history</button></div>
+  <div class="table-wrap"><div id="historyContainer"></div></div>
+</section>
+<div class="footer">Decision-support prototype. Final disposition should follow applicable quality, safety, regulatory, and release-governance processes.</div>
+</main>
+
+<div id="helpModal" class="modal-backdrop" onclick="backdropClose(event)"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><div class="modal-head"><h2 id="helpTitle">Scoring &amp; Decision Cheat Sheet</h2><button class="close" onclick="closeHelp()" aria-label="Close">×</button></div><div class="modal-body">
+<p>This reference explains how selections are scored. Issue Impact and Change Risk are calculated independently and combined only after the assessment is submitted. Confirmed Safety or Regulatory/Compliance impact overrides the matrix and returns <b>ESCALATE</b>. Issue Impact uses weighted scoring so severity and customer impact carry more influence than lower-order factors such as occurrence or workaround.</p>
+
+<div class="legend" style="margin:12px 0"><h3>Issue Impact scoring</h3><div style="overflow-x:auto"><table class="matrix" style="margin:10px 0 0"><thead><tr><th>Criterion</th><th>Selection</th><th>Points</th></tr></thead><tbody>
+<tr><td>Severity</td><td>Critical / High / Medium / Low</td><td>10 / 7 / 3 / 1</td></tr>
+<tr><td>Customer Impact</td><td>Blocking / Significant / Minor / None</td><td>8 / 5 / 2 / 0</td></tr>
+<tr><td>Safety Impact</td><td>Confirmed / Potential / No</td><td>8 + Override / 6 / 0</td></tr>
+<tr><td>Regulatory / Compliance</td><td>Confirmed / Potential / No</td><td>7 + Override / 5 / 0</td></tr>
+<tr><td>Workaround</td><td>None / Partial or Difficult / Available</td><td>6 / 3 / 0</td></tr>
+<tr><td>Occurrence / Exposure</td><td>Common / Occasional / Rare</td><td>5 / 3 / 1</td></tr>
+</tbody></table></div></div>
+
+<div class="legend" style="margin:12px 0"><h3>Change Risk scoring</h3><div style="overflow-x:auto"><table class="matrix" style="margin:10px 0 0"><thead><tr><th>Criterion</th><th>Selection</th><th>Points</th></tr></thead><tbody>
+<tr><td>Level of Effort</td><td>Small / Medium / Large</td><td>1 / 2 / 3</td></tr>
+<tr><td>Regression Risk</td><td>Low / Medium / High</td><td>1 / 2 / 3</td></tr>
+<tr><td>Impact to Release Timeline</td><td>Low / Medium / High</td><td>1 / 2 / 3</td></tr>
+<tr><td>Release Phase</td><td>Dev Ready / Development / Dry Run / Design Validation</td><td>0 / 1 / 2 / 3</td></tr>
+</tbody></table></div></div>
+
+<div class="legend-grid"><div class="legend"><h3>Issue Impact bands — max 44</h3><div>Low: 0–8<br>Medium: 9–17<br>High: 18–44</div></div><div class="legend"><h3>Change Risk bands — max 12</h3><div>Low: 3–5<br>Medium: 6–8<br>High: 9–12</div></div></div>
+
+<h3 style="font-size:12px;margin:18px 0 8px">Decision matrix</h3>
+<table class="matrix"><thead><tr><th>Issue Impact</th><th>Low Change Risk</th><th>Medium Change Risk</th><th>High Change Risk</th></tr></thead><tbody><tr><th>High</th><td>FIX NOW</td><td>FIX NOW</td><td>ESCALATE</td></tr><tr><th>Medium</th><td>FIX NOW</td><td>FIX SOON</td><td>FIX SOON</td></tr><tr><th>Low</th><td>FIX SOON</td><td>FIX LATER</td><td>FIX LATER</td></tr></tbody></table>
+</div></div></div>
+<div id="toast" class="toast"></div>
+<script>
+const $=id=>document.getElementById(id);
+const FIELD_IDS=['severity','customer','safety','regulatory','workaround','occurrence','effort','regression','timeline','phase'];
+const URGENCY_IDS=['severity','customer','safety','regulatory','workaround','occurrence'];
+const RISK_IDS=['effort','regression','timeline','phase'];
+const HISTORY_KEY='bugDecisionHistoryV4';
+function val(id){return $(id).value}
+function num(id){return Number(val(id))}
+function label(id){const s=$(id);return s.selectedIndex>=0?s.options[s.selectedIndex].text:''}
+function fieldName(k){return({severity:'Severity',customer:'Customer Impact',safety:'Safety Impact',regulatory:'Regulatory / Compliance',workaround:'Workaround',occurrence:'Occurrence / Exposure',effort:'Level of Effort',regression:'Regression Risk',timeline:'Impact to Release Timeline',phase:'Release Phase'})[k]||k}
+function pointFor(id){if(val(id)==='override')return id==='safety'?8:7;return Number(val(id))}
+function pointLabelFromAnswer(id,answer){if(answer==='Yes — confirmed')return id==='safety'?'8 + override':'7 + override';const maps={severity:{Critical:10,High:7,Medium:3,Low:1},customer:{Blocking:8,Significant:5,Minor:2,None:0},safety:{'Potential / under assessment':6,No:0},regulatory:{'Potential / under assessment':5,No:0},workaround:{None:6,'Partial / difficult':3,Available:0},occurrence:{Common:5,Occasional:3,Rare:1},effort:{Small:1,Medium:2,Large:3},regression:{Low:1,Medium:2,High:3},timeline:{Low:1,Medium:2,High:3},phase:{'Dev Ready (Documentation)':0,Development:1,'Dry Run':2,'Design Validation (Release Candidate Validation)':3}};return String(maps[id]?.[answer] ?? '—')}
+function urgencyBand(score){return score>=18?'High':score>=9?'Medium':'Low'}
+function riskBand(score){return score>=9?'High':score>=6?'Medium':'Low'}
+function matrixDecision(u,r){if(u==='High'&&r==='High')return 'ESCALATE';if(u==='High')return 'FIX NOW';if(u==='Medium'&&r==='Low')return 'FIX NOW';if(u==='Medium')return 'FIX SOON';if(u==='Low'&&r==='Low')return 'FIX SOON';return 'FIX LATER'}
+function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function validate(){if(!val('bugId').trim()){alert('Please enter a Bug ID.');$('bugId').focus();return false}for(const id of FIELD_IDS){if(val(id)===''){alert('Please complete all assessment fields.');$(id).focus();return false}}return true}
+function decisionClass(d){return d==='FIX NOW'?'now':d==='FIX SOON'?'soon':d==='FIX LATER'?'later':'esc'}
+function showToast(text){const t=$('toast');t.textContent=text;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+function evaluateBug(){
+ if(!validate())return;
+ const safetyOverride=val('safety')==='override',regOverride=val('regulatory')==='override';
+ const urgency=URGENCY_IDS.reduce((s,id)=>s+pointFor(id),0), risk=RISK_IDS.reduce((s,id)=>s+pointFor(id),0);
+ const u=urgencyBand(urgency),r=riskBand(risk);const d=(safetyOverride||regOverride)?'ESCALATE':matrixDecision(u,r);
+ const reasons=[];if(['Critical','High'].includes(label('severity')))reasons.push(label('severity')+' severity');if(['Blocking','Significant'].includes(label('customer')))reasons.push(label('customer')+' customer impact');if(label('workaround')==='None')reasons.push('No workaround available');if(label('occurrence')==='Common')reasons.push('Common customer exposure');if(label('regression')==='High')reasons.push('High regression risk');if(label('timeline')==='High')reasons.push('High impact to release timeline');if(label('effort')==='Large')reasons.push('Large implementation effort');if(label('phase').startsWith('Design Validation'))reasons.push('Release is in Design Validation / RC validation');if(safetyOverride)reasons.unshift('Confirmed safety impact — mandatory escalation');if(regOverride)reasons.unshift('Confirmed regulatory/compliance impact — mandatory escalation');if(!reasons.length)reasons.push('Recommendation is based on the combined score bands.');
+ const rec=d==='FIX NOW'?'Candidate for the current release.':d==='FIX SOON'?'Prioritize for the next appropriate release unless current-release inclusion is justified.':d==='FIX LATER'?'Plan for a future release/backlog based on capacity and prioritization.':'Cross-functional release decision required before disposition.';
+ const answers=Object.fromEntries(FIELD_IDS.map(id=>[id,label(id)]));const points=Object.fromEntries(FIELD_IDS.map(id=>[id,pointLabelFromAnswer(id,label(id))]));
+ const record={id:Date.now(),bugId:val('bugId').trim(),decision:d,urgency,urgencyBand:u,risk,riskBand:r,reasons,rec,createdAt:new Date().toISOString(),answers,points};
+ $('assessmentForm').classList.add('hidden');saveRecord(record);renderResult(record);renderHistory();showToast('Assessment complete');
+}
+function breakdownHtml(record,ids,title){return `<div class="breakgroup"><div class="breakgroup-title">${title}</div>${ids.map(id=>`<div class="breakrow"><div class="crit">${fieldName(id)}</div><div class="ans">${escapeHtml(record.answers[id])}</div><div class="pt ${String(record.points[id]).includes('override')?'override':''}">${escapeHtml(record.points[id])} pts</div></div>`).join('')}</div>`}
+function renderResult(record){
+ const cls=decisionClass(record.decision);$('decision').innerHTML=`<div class="result-head"><div class="eyebrow">Assessment result</div><div class="decision-title"><h2 class="${cls}" style="background:none">${record.decision}</h2><div class="bugref">${escapeHtml(record.bugId)}</div></div><div class="recommend">${record.rec}</div></div><div class="summary-strip"><div class="metric"><div class="meta">Issue Impact</div><strong>${record.urgency} / 44</strong><span class="band">${record.urgencyBand}</span></div><div class="metric"><div class="meta">Change Risk</div><strong>${record.risk} / 12</strong><span class="band">${record.riskBand}</span></div></div><div class="breakdown"><h3>Point breakdown</h3><div class="breakgrid">${breakdownHtml(record,URGENCY_IDS,'Issue Impact')}${breakdownHtml(record,RISK_IDS,'Change Risk')}</div></div><div class="rationale"><div class="rationale-box"><b>Decision rationale</b><ul>${record.reasons.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></div></div><div class="result-actions"><button class="btn primary" onclick="newAssessment()">New assessment</button><button class="btn secondary" onclick="editAssessment()">Edit inputs</button></div>`;
+ $('result').classList.remove('hidden');requestAnimationFrame(()=>requestAnimationFrame(()=>{const el=$('result'),bar=document.querySelector('.appbar');const y=el.getBoundingClientRect().top+window.scrollY-(bar?.offsetHeight||0)-10;window.scrollTo({top:y,behavior:'smooth'});}));
+}
+function saveRecord(record){const h=getHistory();h.unshift(record);localStorage.setItem(HISTORY_KEY,JSON.stringify(h.slice(0,200)))}
+function getHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]')}catch{return []}}
+function renderHistory(){const h=getHistory(),c=$('historyContainer');if(!h.length){c.innerHTML='<div class="empty">No saved assessments yet.</div>';return}c.innerHTML=`<table><thead><tr><th>Bug ID</th><th>Decision</th><th>Issue Impact</th><th>Change Risk</th><th>Rationale</th><th>Details</th></tr></thead><tbody>${h.map(r=>`<tr><td><b>${escapeHtml(r.bugId)}</b><br><span style="color:#98a2b3;font-size:9px">${new Date(r.createdAt).toLocaleString()}</span></td><td><span class="chip ${decisionClass(r.decision)}">${r.decision}</span></td><td><b>${r.urgency}/44</b><br>${r.urgencyBand}</td><td><b>${r.risk}/12</b><br>${r.riskBand}</td><td>${r.reasons.map(escapeHtml).join(' • ')}</td><td><button class="mini" onclick="toggleDetails(${r.id})">Score breakdown</button></td></tr><tr id="details-${r.id}" class="details-row" style="display:none"><td colspan="6"><div class="detail-breakdown"><div class="breakgrid">${breakdownHtml(r,URGENCY_IDS,'Issue Impact')}${breakdownHtml(r,RISK_IDS,'Change Risk')}</div></div></td></tr>`).join('')}</tbody></table>`}
+function toggleDetails(id){const row=$('details-'+id);row.style.display=row.style.display==='none'?'table-row':'none'}
+function resetForm(){$('bugId').value='';FIELD_IDS.forEach(id=>$(id).selectedIndex=0);$('result').classList.add('hidden');$('assessmentForm').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>$('bugId').focus(),200)}
+function newAssessment(){resetForm()}function editAssessment(){$('assessmentForm').classList.remove('hidden');$('result').classList.add('hidden');window.scrollTo({top:0,behavior:'smooth'})}
+function clearHistory(){if(!getHistory().length)return;if(confirm('Clear all saved assessment history from this browser?')){localStorage.removeItem(HISTORY_KEY);renderHistory();showToast('History cleared')}}
+function openHelp(){$('helpModal').classList.add('show');document.body.style.overflow='hidden'}function closeHelp(){$('helpModal').classList.remove('show');document.body.style.overflow=''}function backdropClose(e){if(e.target===$('helpModal'))closeHelp()}document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHelp()});
+renderHistory();$('bugId').focus();
+</script>
+</body>
+</html>
